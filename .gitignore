@@ -1,0 +1,10 @@
+### IntelliJ ###
+.idea
+*.iws
+*.iml
+*.ipr
+
+target/
+project/
+.gradle
+build
