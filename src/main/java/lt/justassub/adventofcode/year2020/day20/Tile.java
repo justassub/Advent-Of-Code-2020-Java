@@ -1,53 +1,59 @@
 package lt.justassub.adventofcode.year2020.day20;
 
-public class Tile {
-    private Long id;
-    private char[][] content;
+import java.util.ArrayList;
+import java.util.Arrays;
+import java.util.List;
 
-    private String topLine;
-    private String bottomLine;
-    private String leftLine;
-    private String rightLine;
+public record Tile(int id, char[][] content) {
 
-    public Tile(Long id, char[][] content) {
-        this.id = id;
-        this.content = content;
-        topLine = String.valueOf(content[0]);
-        bottomLine = String.valueOf(content[content.length - 1]);
-
-        StringBuilder leftLine = new StringBuilder();
-        StringBuilder rightLine = new StringBuilder();
-
-        for (int i = 0; i < content.length; i++) {
-            leftLine.append(content[i][0]);
-            rightLine.append(content[i][content[i].length - 1]);
+    public int matches(List<Tile> tiles) {
+        List<char[]> edgeArrays = getEdgeArrays();
+        int count = 0;
+        for (Tile tile : tiles) {
+            if (tile.id == this.id) {
+                continue;
+            }
+            for (char[] possibleEdgeMatch : tile.getEdgeArrays()) {
+                for (char[] myEdgeArray : edgeArrays) {
+                    if ((Arrays.equals(possibleEdgeMatch, myEdgeArray) || Arrays.equals(myEdgeArray, reverse(possibleEdgeMatch)))) {
+                        count++;
+                    }
+                }
+            }
         }
-
-        this.leftLine = leftLine.toString();
-        this.rightLine = rightLine.toString();
-
-
+        return count;
     }
 
-
-    public Long getId() {
-        return id;
+    private char[] reverse(char[] arr) {
+        char[] tmpArray = new char[content.length];
+        for (int i = 0; i < arr.length; i++) {
+            tmpArray[i] = arr[arr.length - i - 1];
+        }
+        return tmpArray;
     }
 
+    private List<char[]> getEdgeArrays() {
+        List<char[]> edgeArrays = new ArrayList<>();
+        edgeArrays.add(content[0]);
+        edgeArrays.add(content[content.length - 1]);
+        char[][] transposedGrid = transposeGrid(content);
+        edgeArrays.add(transposedGrid[0]);
+        edgeArrays.add(transposedGrid[content.length - 1]);
+        return edgeArrays;
+    }
 
-    public Match combines(Tile t) {
-        if (this.rightLine.equals(t.leftLine)) {
-            return Match.RIGHT;
+    public static char[][] transposeGrid(char[][] grid) {
+        int m = grid.length;
+        int n = grid[0].length;
+
+        char[][] transposed = new char[n][m];
+
+        for (int x = 0; x < n; x++) {
+            for (int y = 0; y < m; y++) {
+                transposed[x][y] = grid[y][x];
+            }
         }
-        if (this.leftLine.equals(t.rightLine)) {
-            return Match.LEFT;
-        }
-        if (this.topLine.equals(t.bottomLine)) {
-            return Match.TOP;
-        }
-        if (this.bottomLine.equals(t.bottomLine)) {
-            return Match.BOTTOM;
-        }
-        return null;
+
+        return transposed;
     }
 }

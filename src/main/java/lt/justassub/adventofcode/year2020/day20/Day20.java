@@ -3,10 +3,11 @@ package lt.justassub.adventofcode.year2020.day20;
 
 import lt.justassub.adventofcode.year2020.Main2020;
 
-import java.util.*;
+import java.util.Arrays;
+import java.util.HashSet;
+import java.util.List;
+import java.util.Set;
 import java.util.stream.Collectors;
-
-import static java.util.stream.Collectors.toMap;
 
 public class Day20 extends Main2020<String, String, Long, Long> {
 
@@ -15,36 +16,33 @@ public class Day20 extends Main2020<String, String, Long, Long> {
     protected Long part1(String input) {
         List<Tile> tileList = Arrays.stream(input.split(
                 "\n" +
-                        "\n"))
+                "\n"))
                 .map(TileBuilder::createTile)
                 .collect(Collectors.toList());
 
-        Map<Tile, List<Match>> info = getMatchers(tileList);
-        return null;
+        return findCorners(tileList).stream()
+                .mapToLong(Tile::id)
+                .reduce(1L, (v, id) -> v * id);
     }
 
-    private Map<Tile, List<Match>> getMatchers(List<Tile> tileList) {
-        Map<Tile, List<Match>> matches = new HashMap<>();
-        for (Tile tile : tileList) {
-            matches.put(tile, new ArrayList<>());
+    private Set<Tile> findCorners(List<Tile> tileList) {
+        Set<Tile> corners = new HashSet<>();
 
-            for (Tile t : tileList) {
-
-                if (tile == t) {
-                    continue;
-                }
-                Match match = tile.combines(t);
-                if (match != null) {
-                    matches.get(tile).add(match);
-                }
+        for (Tile t : tileList) {
+            if (t.matches(tileList) == 2) {
+                corners.add(t);
             }
         }
-
-        return matches;
+        if (corners.size() != 4) {
+            throw new RuntimeException("");
+        }
+        return corners;
     }
 
     @Override
     protected Long part2(String input) {
+
+        //TODO never
         return null;
     }
 
