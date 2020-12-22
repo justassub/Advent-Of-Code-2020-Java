@@ -4,10 +4,10 @@ import lombok.AllArgsConstructor;
 
 @AllArgsConstructor
 public class WarGame {
-    private Player player1;
-    private Player player2;
+    private final Player player1;
+    private final Player player2;
 
-    public void playGame() {
+    public Player playGame() {
         while (!player1.getCards().isEmpty() && !player2.getCards().isEmpty()) {
             Integer player1Card = extractNextCard(player1);
             Integer player2Card = extractNextCard(player2);
@@ -20,14 +20,15 @@ public class WarGame {
                 throw new NotSupportedOperation("Not Supported operation.");
             }
         }
+        return player1.getCards().isEmpty() ? player2 : player1;
     }
 
     private Integer extractNextCard(Player player) {
         return player.getCards().removeFirst();
     }
 
-    private static class NotSupportedOperation extends RuntimeException {
-        private NotSupportedOperation(String message) {
+    static class NotSupportedOperation extends RuntimeException {
+        NotSupportedOperation(String message) {
             super(message);
         }
     }
