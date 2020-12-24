@@ -1,14 +1,9 @@
 package lt.justassub.adventofcode.year2020.day24;
 
-import java.util.List;
-
-import static lt.justassub.adventofcode.year2020.day24.Direction.*;
+import static lt.justassub.adventofcode.year2020.day24.Constants.DIRECTIONS;
 
 public class LayoutFactory {
-    private final static List<Direction> DIRECTIONS = List.of(
-            NORTH_WEST, NORTH_EAST, SOUTH_EAST, SOUTH_WEST,
-            WEST, EAST
-    );
+
 
     public static Layout buildLayout(String line) {
         Layout layout = new Layout();

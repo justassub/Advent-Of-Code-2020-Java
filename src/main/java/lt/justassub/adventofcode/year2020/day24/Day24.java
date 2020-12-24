@@ -3,29 +3,69 @@ package lt.justassub.adventofcode.year2020.day24;
 import lt.justassub.adventofcode.year2020.Main2020;
 
 import java.util.List;
-import java.util.function.Function;
+import java.util.Map;
+import java.util.Set;
 import java.util.stream.Collectors;
+import java.util.stream.Stream;
 
-public class Day24 extends Main2020<List<String>, List<String>, Long, Long> {
+import static java.util.function.Predicate.not;
+import static java.util.function.UnaryOperator.identity;
+import static java.util.stream.Collectors.counting;
+import static java.util.stream.Collectors.toSet;
+
+public class Day24 extends Main2020<List<String>, List<String>, Integer, Integer> {
     @Override
-    protected Long part1(List<String> input) {
+    protected Integer part1(List<String> input) {
 
-        return input.stream()
-                .map(LayoutFactory::buildLayout)
-                .collect(Collectors.groupingBy(Function.identity(), Collectors.counting()))
-                .values().stream()
-                .filter(n -> n % 2 != 0)
-                .count();
+        return getActiveLayouts(input).size();
     }
 
     @Override
-    protected Long part2(List<String> input) {
-        return null;
+    protected Integer part2(List<String> input) {
+        Set<Layout> layouts = getActiveLayouts(input);
+
+        for (int i = 0; i < 100; i++) {
+
+            layouts = Stream.concat(
+                    getLayoutsForBlack(layouts),
+                    getLayoutsForWhite(layouts)
+            ).collect(Collectors.toSet());
+        }
+        return layouts.size();
+    }
+
+    private Stream<Layout> getLayoutsForBlack(Set<Layout> actives) {
+        return actives.stream()
+                .filter(l -> {
+                    long size = l.getAdjancedLayouts().stream().filter(actives::contains).count();
+                    return size == 1 || size == 2;
+                });
+
+    }
+
+    private Stream<Layout> getLayoutsForWhite(Set<Layout> actives) {
+        return actives.stream()
+                .flatMap(a -> a.getAdjancedLayouts().stream())
+                .filter(not(actives::contains))
+                .filter(notActives -> notActives.getAdjancedLayouts().stream()
+                                              .filter(actives::contains).count() == 2
+                );
+    }
+
+    private Set<Layout> getActiveLayouts(List<String> input) {
+        return input.stream()
+                .map(LayoutFactory::buildLayout)
+                .collect(Collectors.groupingBy(identity(), counting())).entrySet().stream()
+                .filter(n -> n.getValue() % 2 != 0)
+                .map(Map.Entry::getKey)
+                .collect(toSet());
+
     }
 
     public static void main(String[] args) {
         Day24 day24 = new Day24();
         List<String> content = day24.getFileContent().collect(Collectors.toList());
         System.out.println(day24.part1(content));
+        System.out.println(day24.part2(content));
     }
 }

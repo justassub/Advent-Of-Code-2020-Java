@@ -28,4 +28,10 @@ public enum Direction {
             return line;
         }
     }
+
+    public Layout getNewLayoutIntoThatDirection(Layout layout) {
+        return new Layout(layout.getX() + changesToX, layout.getY() + changesToY);
+
+    }
+
 }
